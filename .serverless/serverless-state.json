@@ -1,0 +1,436 @@
+{
+      "service": {
+            "service": "my-express-rest-service",
+            "serviceObject": {
+                  "name": "my-express-rest-service"
+            },
+            "provider": {
+                  "stage": "production",
+                  "variableSyntax": "\\${([^{}]+?)}",
+                  "name": "aws",
+                  "runtime": "nodejs12.x",
+                  "memorySize": 128,
+                  "timeout": 10,
+                  "region": "ap-south-1",
+                  "versionFunctions": true,
+                  "remoteFunctionData": null,
+                  "compiledCloudFormationTemplate": {
+                        "AWSTemplateFormatVersion": "2010-09-09",
+                        "Description": "The AWS CloudFormation template for this Serverless application",
+                        "Resources": {
+                              "ServerlessDeploymentBucket": {
+                                    "Type": "AWS::S3::Bucket",
+                                    "Properties": {
+                                          "BucketEncryption": {
+                                                "ServerSideEncryptionC{onfiguration": [{
+                                                        "SSEAlgorithm": "AES256"
+                                                      }
+                                                }]
+                                 ]         }
+                            }       }
+                              },
+                     ,       "ServerlessDeploymentBucketPolicy": {
+                                  "Properties": {
+                                        "Bucket": {
+                                            "Ref": "ServerlessDeploymentBucket"
+                                          },
+                                            "PolicyDocument": {
+                                              "Statement": [{
+                                                  "Action": "s3:*",
+                                              {      "Effect": "Deny",
+                                                    "Resource": [{
+                                                        "Fn::Join": [
+                                                            "", [
+                                                 {               "arn:",
+                                                                    "Ref": "AWS::Partition"
+                                            "", [
+                                                                    {
+                                                                        "Ref": "ServerlessDeploymentBucket"
+                                                                      },
+                                                                    "/*"
+                                                                ]
+                                                            ]
+                                                          }],
+                                                        "Condition": {
+                                                            "Bool": {
+                                                              "aws:SecureTransport": false
+                                        ]
+                                    }            }]
+                                            }
+                                          }
+                     },                   
+                          "A            piLogGroup": {
+                                        "Type": "AWS::Logs::LogGroup",
+                                 ]     "Properties": {
+                            }           "LogGroupName": "/aws/lambda/my-express-rest-service-production-api"
+                                  }
+                     ,       },
+                                  "Type": "AWS::IAM::Role",
+                                    "Properties": {
+                                        "AssumeRolePolicyDocument": {
+                                              "Version": "2012-10-17",
+                                            "Statement": [{
+                                              "Effect": "Allow",
+                                              "Principal": {
+                                                    "Service": [
+                                                        "lambda.amazonaws.com"
+                                                      ]
+                                                    },
+                                              {      "Action": [
+                                                    ]
+                                                }]
+                                              },
+                                                "Policies": [{
+                                                  "PolicyName": {
+                                                    "Fn::Join": [
+                                                        "-", [
+                                                              "my-express-rest-service-production",
+                                                            "lambda"
+                                 ]                     ]
+                            },                   ]
+                                         {     "PolicyDocument": {
+                                                  "Statement": [{
+                                                            "Effect": "Allow",
+                                             [                  "Action": [
+                                                                    "logs:CreateLogGroup"
+                                                                ],
+                                                              "Resource": [{
+                                                                "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/my-express-rest-service-production*:*"
+                                                          }]
+                                                      },
+                                                        {
+                                                  {          "Effect": "Allow",
+                                                                    "logs:PutLogEvents"
+                                                                ],
+                                                                  "Resource": [{
+                                                                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/my-express-rest-service-production*:*:*"
+                                                                }]
+                                                         {   }
+                                                    }
+                                            }]
+                                              "RoleName": {
+                                                  "Fn::Join": [
+                                                        "-", [
+                                                            "my-express-rest-service-production",
+                                                              {
+                                                                "Ref": "AWS::Region"
+                                                         {   },
+                                                        ]
+                                             ]     ]
+                                        }
+                                    },
+                                  "ApiLambdaFunction": {
+                             ],       "Type": "AWS::Lambda::Function",
+                                          "Code": {
+                                              "S3Bucket": {
+                                                    "Ref": "ServerlessDeploymentBucket"
+                                         [          },
+                                                },
+                                                "FunctionName": "my-express-rest-service-production-api",
+                                                  "Handler": "lambda.universal",
+                                                "MemorySize": 128,
+                                                "Role": {
+                                                  "Fn::GetAtt": [
+                                                    "IamRoleLambdaExecution",
+                                                  "Arn"
+                                            ]
+                                      },
+                                      "Runtime": "nodejs12.x",
+                                        "Timeout": 10
+                                    },
+                                      "DependsOn": [
+                                            "ApiLogGroup",
+                                              "IamRoleLambdaExecution"
+                                        ]
+                                    },
+                                  "ApiLambdaVersion8ydJHmAU8YE4dMkCPyXt2eceGefmKjK5Gal1STl4M": {
+                                      "Type": "AWS::Lambda::Version",
+                                      "DeletionPolicy": "Retain",
+                                      "Properties": {
+                                          "FunctionName": {
+                                                "Ref": "ApiLambdaFunction"
+                                              },
+                                              "CodeSha256": "2MPCKvAmkPpN1rljpjfK5/2vNthFrgcLHa7aQOvOB2Q="
+                                        }
+                                  },
+                                  "ApiGatewayRestApi": {
+                                      "Type": "AWS::ApiGateway::RestApi",
+                                    "Properties": {
+                                        "Name": "production-my-express-rest-service",
+                                          "EndpointConfiguration": {
+                                              "Types": [
+                                                "EDGE"
+                                          ]
+                                      },
+                                        "Policy": ""
+                                    }
+                                },
+                                  "ApiGatewayResourceProxyVar": {
+                                        "Type": "AWS::ApiGateway::Resource",
+                                      "Properties": {
+                                          "ParentId": {
+                                            "Fn::GetAtt": [
+                                              "ApiGatewayRestApi",
+                                              "RootResourceId"
+                                            ]
+                                        },
+                                          "PathPart": "{proxy+}",
+                                          "RestApiId": {
+                                                "Ref": "ApiGatewayRestApi"
+                                              }
+                                        }
+                                  },
+                                  "ApiGatewayMethodProxyVarAny": {
+                                    "Type": "AWS::ApiGateway::Method",
+                                  "Properties": {
+                                      "HttpMethod": "ANY",
+                                        "RequestParameters": {},
+                                        "ResourceId": {
+                                              "Ref": "ApiGatewayResourceProxyVar"
+                                            },
+                                              "RestApiId": {
+                                                  "Ref": "ApiGatewayRestApi"
+                                            },
+                                          "ApiKeyRequired": false,
+                                          "AuthorizationType": "NONE",
+                                          "Integration": {
+                                                "IntegrationHttpMethod": "POST",
+                                              "Type": "AWS_PROXY",
+                                            "Uri": {
+                                              "Fn::Join": [
+                                                  "", [
+                                                        "arn:",
+                                                        {
+                                                              "Ref": "AWS::Partition"
+                                                          },
+                                                          ":apigateway:",
+                                                            {
+                                                              "Ref": "AWS::Region"
+                                                          },
+                                                            ":lambda:path/2015-03-31/functions/",
+                                                          {
+                                                              "Fn::GetAtt": [
+                                                                  "ApiLambdaFunction",
+                                                                  "Arn"
+                                                                ]
+                                                            },
+                                                            "/invocations"
+                                                          ]
+                                            [             ]
+                                                  },
+                                                  "MethodResponses": []
+                                                }
+                                },          
+                      "A                    piGatewayMethodAny": {
+                                              "Type": "AWS::ApiGateway::Method",
+                                                "Properties": {
+                                                  "HttpMethod": "ANY",
+                                                  "RequestParameters": {},
+                                                  "ResourceId": {
+                                                        "Fn::GetAtt": [
+                                                              "ApiGatewayRestApi",
+                                                              "RootResourceId"
+                                                        ]
+                                                  },
+                                                  "RestApiId": {
+                                                    "Ref": "ApiGatewayRestApi"
+                                              },
+                                            "ApiKeyRequired": false,
+                                          "AuthorizationType": "NONE",
+                                          "Integration": {
+                                            "IntegrationHttpMethod": "POST",
+                                          "Type": "AWS_PROXY",
+                                          "Uri": {
+                                                "Fn::Join": [
+                                                    "", [
+                                                          "arn:",
+                                                          {
+                                                              "Ref": "AWS::Partition"
+                                                            },
+                                                              ":apigateway:",
+                                                              {
+                                                                "Ref": "AWS::Region"
+                                                          },
+                                                          ":lambda:path/2015-03-31/functions/",
+                                                            {
+                                                              "Fn::GetAtt": [
+                                                                  "ApiLambdaFunction",
+                                                                  "Arn"
+                                                              ]
+                                                            },
+                                                            "/invocations"
+                                                        ]
+                                                      ]
+                                            [         }
+                                                  "MethodResponses": []
+                                              }
+                                     },       
+                                      "A    piGatewayDeployment1585375488105": {
+                                              "Type": "AWS::ApiGateway::Deployment",
+                                              "Properties": {
+                                                    "RestApiId": {
+                                                      "Ref": "ApiGatewayRestApi"
+                                                  },
+                                                  "StageName": "production"
+                                                },
+                                      "D            ependsOn": [
+                                                      "ApiGatewayMethodProxyVarAny",
+                                                    "ApiGatewayMethodAny"
+                                              ]
+                                     },     
+                                        "ApiLambdaPermissionApiGateway": {
+                                          "Type": "AWS::Lambda::Permission",
+                                        "Properties": {
+                                          "FunctionName": {
+                                              "Fn::GetAtt": [
+                                                "ApiLambdaFunction",
+                                              "Arn"
+                                          ]
+                                        },
+                                        "Action": "lambda:InvokeFunction",
+                                          "Principal": "apigateway.amazonaws.com",
+                                            "SourceArn": {
+                                              "Fn::Join": [
+                                                  "", [
+                                                    "arn:",
+                                                    {
+                                                          "Ref": "AWS::Partition"
+                                                      },
+                                                    ":execute-api:",
+                                                  {
+                                                      "Ref": "AWS::Region"
+                                                    },
+                                                    ":",
+                                                      {
+                                                            "Ref": "AWS::AccountId"
+                                                          },
+                                                          ":",
+                                                        {
+                                                          "Ref": "ApiGatewayRestApi"
+                                                      },
+                                                      "/*/*"
+                                                  ]
+                                                ]
+                                        [       }
+                                        }
+                               },     
+                                    "Outpu  ts": {
+                                        "ServerlessDeploymentBucketName": {
+                                            "Value": {
+                                                "Ref": "ServerlessDeploymentBucket"
+                                              }
+                                        },
+                                        "ApiLambdaFunctionQualifiedArn": {
+                                            "Description": "Current Lambda function version",
+                                              "Value": {
+                                                "Ref": "ApiLambdaVersion8ydJHmAU8YE4dMkCPyXt2eceGefmKjK5Gal1STl4M"
+                                            }
+                                        },
+                    "S                      erviceEndpoint": {
+                                            "Description": "URL of the service endpoint",
+                                            "Value": {
+                                              "Fn::Join": [
+                                                "", [
+                                                  "https://",
+                                                {
+                                                  "Ref": "ApiGatewayRestApi"
+                                            },
+                                            ".execute-api.",
+                                              {
+                                                    "Ref": "AWS::Region"
+                                                  },
+                                                ".",
+                                              {
+                                                  "Ref": "AWS::URLSuffix"
+                                                },
+                                                "/production"
+                                              ]
+                                        ]
+                                  }
+                              }
+                            }
+                        },
+                  "c        oreCloudFormationTemplate": {
+                                "AW [STemplateFormatVersion": "2010-09-09",
+                                  "Resources": {
+                                      "ServerlessDeploymentBucket": {
+                                            "Type": "AWS::S3::Bucket",
+                                          "Properties": {
+                                              "BucketEncryption": {
+                                                  "ServerSideEncryptionConfiguration": [{
+                                                        "ServerSideEncryptionByDefault": {
+                                                          "SSEAlgorithm": "AES256"
+                                                      }
+                                                  }]
+                                                }
+                                          }
+                                      },
+                                    "ServerlessDeploymentBucketPolicy": {
+                                      "Type": "AWS::S3::BucketPolicy",
+                                    "Properties": {
+                                      "Bucket": {
+                                        "Ref": "ServerlessDeploymentBucket"
+                                  },
+                                  "PolicyDocument": {
+                                        "Statement": [{
+                                            "Action": "s3:*",
+                                            "Effect": "Deny",
+                                              "Principal": "*",
+                                                "Resource": [{
+                                                    "Fn::Join": [
+                                                          "", [
+                                                                "arn:"{,
+                                                                    "Ref": "AWS::Partition"
+                                                                  },
+                                                                ":s3:::",
+                                 ]                             {
+                            }                                   "Ref": "ServerlessDeploymentBucket"
+                                                          },
+                     ,                                   "/*"
+                                                  ]
+                                                }],
+                                                "Condition": {
+                                                      "Bool": {
+                                                            "aws:SecureTransport": false
+                                                      }
+                                                  }
+                                              {  }]
+                                        }
+                                    }
+                       },         
+                   "Out             puts": {{
+              "S                        "Value": {
+                                            "", [
+                  }                    }
+                    }                
+                      },            
+                         "vpc": {}       
+                          },  
+                   "pluginsData": {},         
+           "functions": {                   
+                  "api": {              
+                           "handler": "         lambda.universal",
+                                "events":   [{
+                                        ]
+              },                    }{
+                                        "http": "ANY /"
+                                    }  
+                           ],         
+                   "name"               : "my-express-rest-service-production-api",
+                          "pac      kage": {},
+                       "m       e]mory": 128,
+                            }timeout": 10,
+                          "runtime": "nodejs12.x",
+                        "vpc": {},
+                 ,     "versionLogicalId": "ApiLambdaVersion8ydJHmAU8YE4dMkCPyXt2eceGefmKjK5Gal1STl4M"
+                },
+                  "serviceFilename": "serverless.yml",
+          "lay          ers": {},
+           "isDas           hboardMonitoringPreconfigured": false,
+         "art           ifact": "E:\\blazeclan\\freshers\\awslambdexample\\.serverless\\my-express-rest-service.zip"
+      },        
+        "pac    kage": {
+              "artifactDirectoryName": "serverless/my-express-rest-service/production/1585375577472-2020-03-28T06:06:17.472Z",
+              "artifact": "my-express-rest-service.zip"
+        }
+}                              {                                                                                                                                                    
